@@ -2,15 +2,21 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
-<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="Math Adventure"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="theme-color" content="#DDD5F8"/>
 <title>Math Adventure</title>
+
+<!-- Generate icon via canvas, injected at runtime -->
+
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+
 <style>
-*{box-sizing:border-box;margin:0;padding:0;}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 :root{
   --mint:#C8EFE3;--mint-t:#2D7A5F;--mint-b:#A8DFD0;
   --sky:#C5DFF8;--sky-t:#1A5A8A;--sky-b:#A3CAEF;
@@ -19,31 +25,80 @@
   --sun:#FAF0C0;--sun-t:#7A6010;--sun-b:#EFDFAA;
   --bg:#FFFFFF;--bg2:#F7F7F8;--text:#1A1A1A;--text2:#6B6B6B;--text3:#AAAAAA;
   --border:#E5E5E5;--border2:#D0D0D0;
-  --radius-xl:20px;--radius-lg:16px;--radius-md:12px;--radius-sm:8px;
+  --r-xl:20px;--r-lg:16px;--r-md:12px;
 }
-html,body{height:100%;background:var(--bg);color:var(--text);}
-body{font-family:'Nunito',sans-serif;max-width:600px;margin:0 auto;padding:16px 20px 40px;min-height:100%;}
+
+html{height:100%;background:#DDD5F8;}
+body{
+  font-family:'Nunito',sans-serif;
+  max-width:600px;
+  margin:0 auto;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  padding: env(safe-area-inset-top,0px) 20px env(safe-area-inset-bottom,20px);
+  padding-top: max(env(safe-area-inset-top,0px), 16px);
+  padding-bottom: max(env(safe-area-inset-bottom,0px), 40px);
+}
+
+/* ── Splash ── */
+#splash{
+  position:fixed;inset:0;
+  background:linear-gradient(160deg,#E8E0FC 0%,#C8EFE3 100%);
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  z-index:9999;
+  transition:opacity 0.5s ease;
+}
+#splash.out{opacity:0;pointer-events:none;}
+.splash-logo{
+  width:110px;height:110px;
+  background:#fff;
+  border-radius:30px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:58px;
+  margin-bottom:22px;
+  box-shadow:0 12px 40px rgba(74,61,154,.18);
+}
+.splash-title{font-size:34px;font-weight:800;color:#4A3D9A;letter-spacing:-.5px;}
+.splash-tagline{font-size:15px;color:#6B5DB5;margin-top:6px;font-weight:600;}
+.splash-dots{display:flex;gap:7px;margin-top:28px;}
+.splash-dot{width:8px;height:8px;border-radius:50%;background:#B0A4EC;animation:pulse 1.2s ease-in-out infinite;}
+.splash-dot:nth-child(2){animation-delay:.2s;}
+.splash-dot:nth-child(3){animation-delay:.4s;}
+@keyframes pulse{0%,80%,100%{opacity:.3;transform:scale(.85);}40%{opacity:1;transform:scale(1);}}
+
+/* ── Screens ── */
 .screen{display:none;}.screen.active{display:block;}
+
+/* ── Header ── */
 .app-header{display:flex;align-items:center;gap:12px;margin-bottom:1.5rem;padding-top:8px;}
-.app-logo{width:44px;height:44px;background:var(--lav);border-radius:var(--radius-lg);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
-.app-title{font-size:26px;font-weight:800;color:var(--text);letter-spacing:-0.3px;}
+.app-logo{width:44px;height:44px;background:var(--lav);border-radius:var(--r-lg);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.app-title{font-size:26px;font-weight:800;color:var(--text);letter-spacing:-.3px;}
 .app-sub{font-size:13px;color:var(--text2);margin-top:1px;}
-.tab-bar{display:flex;gap:6px;margin-bottom:1.5rem;background:var(--bg2);border-radius:var(--radius-lg);padding:4px;}
-.tab-btn{flex:1;padding:10px 12px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;color:var(--text2);background:none;border:none;border-radius:var(--radius-md);cursor:pointer;transition:background .15s,color .15s;-webkit-tap-highlight-color:transparent;}
-.tab-btn.active{background:var(--bg);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.08);border:0.5px solid var(--border);}
+
+/* ── Tabs ── */
+.tab-bar{display:flex;gap:6px;margin-bottom:1.5rem;background:var(--bg2);border-radius:var(--r-lg);padding:4px;}
+.tab-btn{flex:1;padding:10px 12px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;color:var(--text2);background:none;border:none;border-radius:var(--r-md);cursor:pointer;transition:background .15s,color .15s;user-select:none;}
+.tab-btn.active{background:var(--bg);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.08);border:.5px solid var(--border);}
+
+/* ── Size picker ── */
 .session-label{font-size:12px;font-weight:800;color:var(--text2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px;}
 .size-row{display:flex;gap:10px;margin-bottom:1.5rem;}
-.size-btn{flex:1;background:var(--bg);border:2px solid var(--border);border-radius:var(--radius-xl);padding:18px 8px;cursor:pointer;text-align:center;transition:border-color .15s,background .15s;-webkit-tap-highlight-color:transparent;user-select:none;}
+.size-btn{flex:1;background:var(--bg);border:2px solid var(--border);border-radius:var(--r-xl);padding:18px 8px;cursor:pointer;text-align:center;transition:border-color .15s,background .15s,transform .1s;user-select:none;}
+.size-btn:active{transform:scale(.97);}
 .size-btn.selected{border-color:#7F77DD;background:#EEEDFE;}
 .size-btn.selected .size-letter{color:#534AB7;}
 .size-letter{font-size:34px;font-weight:800;color:var(--text);line-height:1;}
 .size-count{font-size:12px;font-weight:700;color:var(--text2);margin-top:5px;}
 .size-desc{font-size:11px;color:var(--text3);margin-top:2px;}
-.go-btn{width:100%;padding:18px;background:var(--lav);border:none;border-radius:var(--radius-xl);font-family:'Nunito',sans-serif;font-size:19px;font-weight:800;color:var(--lav-t);cursor:pointer;transition:background .15s;-webkit-tap-highlight-color:transparent;}
-.go-btn:active{background:var(--lav-b);}
+.go-btn{width:100%;padding:18px;background:var(--lav);border:none;border-radius:var(--r-xl);font-family:'Nunito',sans-serif;font-size:19px;font-weight:800;color:var(--lav-t);cursor:pointer;transition:background .15s,transform .1s;user-select:none;}
+.go-btn:active{background:var(--lav-b);transform:scale(.99);}
+
+/* ── Progress ── */
 .skill-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
-.skill-card{border-radius:var(--radius-lg);padding:14px;}
-.skill-icon-wrap{width:36px;height:36px;border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:10px;background:rgba(255,255,255,.55);}
+.skill-card{border-radius:var(--r-lg);padding:14px;}
+.skill-icon-wrap{width:36px;height:36px;border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:10px;background:rgba(255,255,255,.55);}
 .skill-name{font-size:13px;font-weight:700;margin-bottom:2px;}
 .skill-lvl{font-size:11px;font-weight:600;opacity:.75;}
 .xp-bar{height:5px;border-radius:3px;margin-top:9px;overflow:hidden;background:rgba(0,0,0,.12);}
@@ -51,31 +106,35 @@ body{font-family:'Nunito',sans-serif;max-width:600px;margin:0 auto;padding:16px 
 .badge-row{display:flex;gap:4px;margin-top:9px;font-size:17px;}
 .badge.locked{opacity:.2;filter:grayscale(1);}
 .total-row{display:flex;gap:10px;margin-bottom:1.5rem;flex-wrap:wrap;}
-.total-chip{background:var(--lav);border-radius:var(--radius-lg);padding:10px 18px;font-size:13px;font-weight:700;color:var(--lav-t);}
+.total-chip{background:var(--lav);border-radius:var(--r-lg);padding:10px 18px;font-size:13px;font-weight:700;color:var(--lav-t);}
 .total-chip span{font-size:20px;font-weight:800;display:block;}
+
+/* ── Question screen ── */
 .q-topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
 .q-counter{font-size:14px;font-weight:700;color:var(--text2);}
-.q-skill-pill{font-size:11px;font-weight:800;padding:5px 13px;border-radius:999px;letter-spacing:.02em;max-width:160px;text-align:center;}
-.streak-pill{font-size:11px;font-weight:800;padding:5px 11px;border-radius:999px;background:var(--sun);color:var(--sun-t);min-width:10px;}
+.q-skill-pill{font-size:11px;font-weight:800;padding:5px 13px;border-radius:999px;letter-spacing:.02em;max-width:165px;text-align:center;}
+.streak-pill{font-size:11px;font-weight:800;padding:5px 11px;border-radius:999px;background:var(--sun);color:var(--sun-t);}
 .streak-pill.hot{background:var(--peach);color:var(--peach-t);}
 .prog-bar{height:8px;border-radius:4px;background:var(--border);margin-bottom:1.25rem;overflow:hidden;}
 .prog-fill{height:100%;border-radius:4px;background:#AFA9EC;transition:width .35s;}
 .score-row{display:flex;gap:10px;margin-bottom:1rem;}
-.score-chip{background:var(--bg2);border-radius:var(--radius-md);padding:7px 14px;font-size:13px;font-weight:700;color:var(--text2);}
+.score-chip{background:var(--bg2);border-radius:var(--r-md);padding:7px 14px;font-size:13px;font-weight:700;color:var(--text2);}
 .score-chip b{color:var(--text);font-weight:800;}
-.question-card{background:var(--sky);border-radius:var(--radius-xl);padding:1.5rem;margin-bottom:1.25rem;font-size:18px;font-weight:700;color:var(--sky-t);min-height:100px;display:flex;align-items:center;line-height:1.6;}
+.question-card{background:var(--sky);border-radius:var(--r-xl);padding:1.5rem;margin-bottom:1.25rem;font-size:18px;font-weight:700;color:var(--sky-t);min-height:100px;display:flex;align-items:center;line-height:1.6;}
 .answer-row{display:flex;gap:10px;margin-bottom:1rem;}
-#answer-input{flex:1;font-family:'Nunito',sans-serif;font-size:20px;font-weight:700;padding:15px 16px;border:2px solid var(--border2);border-radius:var(--radius-xl);background:var(--bg);color:var(--text);outline:none;-webkit-appearance:none;}
+#answer-input{flex:1;font-family:'Nunito',sans-serif;font-size:20px;font-weight:700;padding:15px 16px;border:2px solid var(--border2);border-radius:var(--r-xl);background:var(--bg);color:var(--text);outline:none;-webkit-appearance:none;appearance:none;}
 #answer-input:focus{border-color:#AFA9EC;box-shadow:0 0 0 3px #EEEDFE;}
-.check-btn{padding:15px 20px;background:var(--lav);border:none;border-radius:var(--radius-xl);font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;color:var(--lav-t);cursor:pointer;white-space:nowrap;-webkit-tap-highlight-color:transparent;}
+.check-btn{padding:15px 20px;background:var(--lav);border:none;border-radius:var(--r-xl);font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;color:var(--lav-t);cursor:pointer;white-space:nowrap;user-select:none;}
 .check-btn:active{background:var(--lav-b);}
 .check-btn:disabled{opacity:.4;}
-.feedback-card{border-radius:var(--radius-xl);padding:1.2rem 1.4rem;margin-bottom:1rem;font-size:15px;line-height:1.65;font-weight:500;display:none;}
+.feedback-card{border-radius:var(--r-xl);padding:1.2rem 1.4rem;margin-bottom:1rem;font-size:15px;line-height:1.65;font-weight:500;display:none;}
 .feedback-card.correct{background:var(--mint);color:var(--mint-t);}
 .feedback-card.wrong{background:var(--peach);color:var(--peach-t);}
 .fb-title{font-size:17px;font-weight:800;margin-bottom:6px;}
-.next-btn{width:100%;padding:15px;background:var(--mint);border:none;border-radius:var(--radius-xl);font-family:'Nunito',sans-serif;font-size:16px;font-weight:800;color:var(--mint-t);cursor:pointer;display:none;-webkit-tap-highlight-color:transparent;}
+.next-btn{width:100%;padding:15px;background:var(--mint);border:none;border-radius:var(--r-xl);font-family:'Nunito',sans-serif;font-size:16px;font-weight:800;color:var(--mint-t);cursor:pointer;display:none;user-select:none;}
 .next-btn:active{background:var(--mint-b);}
+
+/* ── Results ── */
 .results-hero{text-align:center;padding:2rem 0 1.5rem;}
 .grade-circle{width:96px;height:96px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:44px;font-weight:800;margin:0 auto 14px;}
 .grade-circle.A{background:var(--mint);color:var(--mint-t);}
@@ -84,7 +143,7 @@ body{font-family:'Nunito',sans-serif;max-width:600px;margin:0 auto;padding:16px 
 .grade-circle.D{background:var(--peach);color:var(--peach-t);}
 .results-msg{font-size:16px;color:var(--text2);font-weight:600;}
 .stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:1.25rem 0;}
-.stat-card{border-radius:var(--radius-lg);padding:1rem;text-align:center;}
+.stat-card{border-radius:var(--r-lg);padding:1rem;text-align:center;}
 .stat-val{font-size:26px;font-weight:800;}
 .stat-lbl{font-size:11px;font-weight:700;opacity:.7;margin-top:3px;}
 .xp-list{margin:.75rem 0;}
@@ -93,13 +152,25 @@ body{font-family:'Nunito',sans-serif;max-width:600px;margin:0 auto;padding:16px 
 .xr-skill{flex:1;color:var(--text);}
 .xr-pts{color:#534AB7;font-weight:800;}
 .xr-none{color:var(--text3);}
-.badge-toast{background:var(--sun);border-radius:var(--radius-lg);padding:11px 15px;font-size:13px;font-weight:700;color:var(--sun-t);margin:6px 0;}
-.action-btn{width:100%;padding:15px;background:var(--lav);border:none;border-radius:var(--radius-xl);font-family:'Nunito',sans-serif;font-size:16px;font-weight:800;color:var(--lav-t);cursor:pointer;margin-top:12px;-webkit-tap-highlight-color:transparent;}
+.badge-toast{background:var(--sun);border-radius:var(--r-lg);padding:11px 15px;font-size:13px;font-weight:700;color:var(--sun-t);margin:6px 0;}
+.action-btn{width:100%;padding:15px;background:var(--lav);border:none;border-radius:var(--r-xl);font-family:'Nunito',sans-serif;font-size:16px;font-weight:800;color:var(--lav-t);cursor:pointer;margin-top:12px;user-select:none;}
 .action-btn:active{background:var(--lav-b);}
 .section-label{font-size:12px;font-weight:800;color:var(--text2);letter-spacing:.08em;text-transform:uppercase;margin:1.25rem 0 .65rem;}
 </style>
 </head>
 <body>
+
+<!-- SPLASH -->
+<div id="splash">
+  <div class="splash-logo">⭐</div>
+  <div class="splash-title">Math Adventure</div>
+  <div class="splash-tagline">Your personal math trainer</div>
+  <div class="splash-dots">
+    <div class="splash-dot"></div>
+    <div class="splash-dot"></div>
+    <div class="splash-dot"></div>
+  </div>
+</div>
 
 <!-- HOME -->
 <div id="home-screen" class="screen active">
@@ -171,19 +242,55 @@ body{font-family:'Nunito',sans-serif;max-width:600px;margin:0 auto;padding:16px 
 </div>
 
 <script>
+// ── Icon injection (home screen icon via canvas) ──
+(function(){
+  try{
+    const c=document.createElement('canvas');
+    c.width=180;c.height=180;
+    const ctx=c.getContext('2d');
+    // Rounded rect background
+    const r=36;
+    ctx.beginPath();
+    ctx.moveTo(r,0);ctx.lineTo(180-r,0);ctx.quadraticCurveTo(180,0,180,r);
+    ctx.lineTo(180,180-r);ctx.quadraticCurveTo(180,180,180-r,180);
+    ctx.lineTo(r,180);ctx.quadraticCurveTo(0,180,0,180-r);
+    ctx.lineTo(0,r);ctx.quadraticCurveTo(0,0,r,0);ctx.closePath();
+    const grad=ctx.createLinearGradient(0,0,180,180);
+    grad.addColorStop(0,'#E8E0FC');grad.addColorStop(1,'#C8EFE3');
+    ctx.fillStyle=grad;ctx.fill();
+    // Star emoji
+    ctx.font='90px serif';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText('⭐',90,95);
+    const link=document.createElement('link');
+    link.rel='apple-touch-icon';
+    link.href=c.toDataURL('image/png');
+    document.head.appendChild(link);
+  }catch(e){}
+})();
+
+// ── Splash dismiss ──
+window.addEventListener('load',()=>{
+  setTimeout(()=>{
+    const s=document.getElementById('splash');
+    s.classList.add('out');
+    setTimeout(()=>s.remove(),600);
+  },1600);
+});
+
+// ── Data ──
 const SKILLS=[
-  {id:'computation',   name:'Computation',             icon:'🧮', bg:'var(--sky)',  tc:'var(--sky-t)',  badges:['🧮','⚡','🏆'],bnames:['Number Cruncher','Lightning Fast','Comp King'],   bat:[50,150,350]},
-  {id:'multiplication',name:'Multiplication & Division',icon:'✖️', bg:'var(--mint)', tc:'var(--mint-t)',badges:['✖️','🎯','🌟'],bnames:['Times Champ','Sharpshooter','Star Multiplier'],  bat:[50,150,350]},
-  {id:'fractions',     name:'Fractions & Decimals',    icon:'🍕', bg:'var(--peach)',tc:'var(--peach-t)',badges:['🍕','🔢','💎'],bnames:['Fraction Finder','Decimal Wizard','Diamond Cutter'],bat:[50,150,350]},
-  {id:'wordproblems',  name:'Word Problems',            icon:'📖', bg:'var(--lav)',  tc:'var(--lav-t)',  badges:['📖','🧠','🦉'],bnames:['Story Solver','Brain Power','Wise Owl'],        bat:[50,150,350]},
-  {id:'geometry',      name:'Geometry & Measurement',  icon:'📐', bg:'var(--sun)',  tc:'var(--sun-t)',  badges:['📐','🔷','🏛️'],bnames:['Shape Spotter','Geo Pro','Architect'],           bat:[50,150,350]}
+  {id:'computation',   name:'Computation',             icon:'🧮',bg:'var(--sky)',  tc:'var(--sky-t)',  badges:['🧮','⚡','🏆'],bnames:['Number Cruncher','Lightning Fast','Comp King'],   bat:[50,150,350]},
+  {id:'multiplication',name:'Multiplication & Division',icon:'✖️',bg:'var(--mint)', tc:'var(--mint-t)',badges:['✖️','🎯','🌟'],bnames:['Times Champ','Sharpshooter','Star Multiplier'],  bat:[50,150,350]},
+  {id:'fractions',     name:'Fractions & Decimals',    icon:'🍕',bg:'var(--peach)',tc:'var(--peach-t)',badges:['🍕','🔢','💎'],bnames:['Fraction Finder','Decimal Wizard','Diamond Cutter'],bat:[50,150,350]},
+  {id:'wordproblems',  name:'Word Problems',            icon:'📖',bg:'var(--lav)',  tc:'var(--lav-t)',  badges:['📖','🧠','🦉'],bnames:['Story Solver','Brain Power','Wise Owl'],        bat:[50,150,350]},
+  {id:'geometry',      name:'Geometry & Measurement',  icon:'📐',bg:'var(--sun)',  tc:'var(--sun-t)',  badges:['📐','🔷','🏛️'],bnames:['Shape Spotter','Geo Pro','Architect'],           bat:[50,150,350]}
 ];
 
 const QB={
   computation:[
     {l:1,q:'What is 378 + 245?',a:'623',hint:'Add ones: 8+5=13, carry 1. Tens: 7+4+1=12, carry 1. Hundreds: 3+2+1=6.'},
     {l:1,q:'What is 503 − 167?',a:'336',hint:'Borrow from hundreds: 503 → 4 hundreds, 9 tens, 13 ones. Now subtract carefully.'},
-    {l:1,q:'What is 9 × 8 + 7 × 6?',a:'114',hint:'Multiply first (order of operations): 9×8=72 and 7×6=42. Then add.'},
+    {l:1,q:'What is 9 × 8 + 7 × 6?',a:'114',hint:'Multiply first: 9×8=72 and 7×6=42. Then add.'},
     {l:1,q:'What is 6 × 7 − 4 × 5?',a:'22',hint:'Multiply first: 6×7=42, 4×5=20. Then subtract.'},
     {l:2,q:'What is (15 + 9) × 7 − 30?',a:'138',hint:'Brackets first: 15+9=24. Then 24×7=168. Then 168−30.'},
     {l:2,q:'What is 48 × 25?',a:'1200',hint:'48×25 = 48×100÷4 = 4800÷4 = 1200.'},
@@ -217,7 +324,7 @@ const QB={
     {l:4,q:'What is 225 × 16?',a:'3600',hint:'225×16 = 225×4×4 = 900×4 = 3600.'},
     {l:4,q:'What is 138 × 35?',a:'4830',hint:'138×35 = 138×30 + 138×5 = 4140+690 = 4830.'},
     {l:4,q:'What is 3,375 ÷ 75?',a:'45',hint:'75×40=3000, 3375−3000=375, 375÷75=5. So 40+5=45.'},
-    {l:5,q:'What is 8,640 ÷ 96?',a:'90',hint:'Simplify by dividing both by 4: 2160÷24. Divide by 4 again: 540÷6=90.'},
+    {l:5,q:'What is 8,640 ÷ 96?',a:'90',hint:'Simplify by dividing both by 4: 2160÷24=90.'},
     {l:5,q:'A number times 36 equals 5,400. What is the number?',a:'150',hint:'5400÷36: 5400÷6=900, 900÷6=150.'},
   ],
   fractions:[
@@ -228,7 +335,7 @@ const QB={
     {l:2,q:'What is 2 3/4 + 1 5/6? Write as a mixed number.',a:'4 7/12',hint:'Whole numbers: 2+1=3. Fractions with denom 12: 9/12+10/12=19/12=1 7/12. Total: 4 7/12.'},
     {l:2,q:'What is 3 1/2 − 1 3/4? Write as a mixed number.',a:'1 3/4',hint:'Convert: 3 2/4 − 1 3/4. Borrow: 2 6/4 − 1 3/4 = 1 3/4.'},
     {l:2,q:'What is 0.125 as a fraction? Simplify fully.',a:'1/8',hint:'0.125 = 125/1000. Divide by 125: 1/8.'},
-    {l:2,q:'What is 3/8 as a decimal?',a:'0.375',hint:'3÷8: 8 into 30 = 3 remainder 6. 8 into 60 = 7 remainder 4. 8 into 40 = 5. So 0.375.'},
+    {l:2,q:'What is 3/8 as a decimal?',a:'0.375',hint:'3÷8: 8 into 30=3 r6. Into 60=7 r4. Into 40=5. So 0.375.'},
     {l:3,q:'What is 4/5 × 2 1/2? Simplify.',a:'2',hint:'Convert 2 1/2 to 5/2. Then 4/5 × 5/2 = 20/10 = 2.'},
     {l:3,q:'Which is larger: 7/12 or 5/9?',a:'7/12',hint:'Common denom 36: 7/12=21/36, 5/9=20/36. 21>20, so 7/12 is larger.'},
     {l:3,q:'What is 1 2/3 × 2 2/5? Write as a whole number.',a:'4',hint:'Convert: 5/3 × 12/5 = 60/15 = 4.'},
@@ -237,7 +344,7 @@ const QB={
     {l:4,q:'What percentage is 3/8?',a:'37.5',hint:'3÷8=0.375. Multiply by 100: 37.5%.'},
     {l:5,q:'A jar is 3/5 full. You add 1/4 more. What fraction is now filled?',a:'17/20',hint:'Common denom 20: 12/20 + 5/20 = 17/20.'},
     {l:5,q:'What is 2 5/6 ÷ 1 1/4? Write as a mixed number.',a:'2 4/15',hint:'17/6 ÷ 5/4 = 17/6 × 4/5 = 68/30 = 34/15 = 2 4/15.'},
-    {l:5,q:'If 2/3 of a number is 48, what is 3/4 of that same number?',a:'54',hint:'Whole number: 48÷(2/3)=48×3/2=72. Then 3/4 of 72=54.'},
+    {l:5,q:'If 2/3 of a number is 48, what is 3/4 of that same number?',a:'54',hint:'Whole number: 48÷(2/3)=72. Then 3/4 of 72=54.'},
   ],
   wordproblems:[
     {l:1,q:'A school orders 24 boxes of pencils with 36 pencils each. They use 415 pencils. How many are left?',a:'449',hint:'Total: 24×36=864. Then 864−415=449.'},
@@ -246,38 +353,38 @@ const QB={
     {l:2,q:'Three friends share a prize equally. One gives half her share to her sister who gets $45. What was the total prize?',a:'270',hint:'Half a share=$45, so one share=$90. Total=3×$90=$270.'},
     {l:2,q:'Apples cost $1.35 each or 6 for $7.20. How much do you save per apple buying in bulk?',a:'0.15',hint:'Bulk price: $7.20÷6=$1.20. Saving: $1.35−$1.20=$0.15.'},
     {l:2,q:'A pool holds 15,000 litres. A pump fills it at 250 litres per minute. How many hours to fill it?',a:'1',hint:'15000÷250=60 minutes = 1 hour.'},
-    {l:2,q:'A farmer plants 3/4 of a field with corn and 1/6 with wheat. What fraction is unplanted?',a:'1/12',hint:'Planted: 3/4+1/6. Common denom 12: 9/12+2/12=11/12. Unplanted: 1−11/12=1/12.'},
-    {l:3,q:'A rectangle has perimeter 54 cm. Its length is twice its width. What is its area in cm²?',a:'162',hint:'Let width=w, length=2w. Perimeter: 2(w+2w)=6w=54, so w=9. Area=9×18=162.'},
+    {l:2,q:'A farmer plants 3/4 of a field with corn and 1/6 with wheat. What fraction is unplanted?',a:'1/12',hint:'Planted: 9/12+2/12=11/12. Unplanted: 1/12.'},
+    {l:3,q:'A rectangle has perimeter 54 cm. Its length is twice its width. What is its area in cm²?',a:'162',hint:'Let width=w, length=2w. 6w=54, w=9. Area=9×18=162.'},
     {l:3,q:'A taxi charges $2.50 base fare plus $0.75 per quarter mile. What is the fare for a 4-mile trip?',a:'14.50',hint:'4 miles=16 quarter-miles. 16×$0.75=$12. Total: $2.50+$12=$14.50.'},
-    {l:3,q:'Tank A holds 240L and is 3/4 full. Tank B holds 180L and is 2/3 full. How many more litres are in Tank A?',a:'60',hint:'Tank A: 3/4×240=180L. Tank B: 2/3×180=120L. Difference: 180−120=60L.'},
-    {l:3,q:'A shop marks up items by 40% then gives a 25% discount. What is the overall percent change from the original price?',a:'5',hint:'After markup: ×1.40. After discount: ×0.75. Combined: 1.40×0.75=1.05. So 5% more than original.'},
-    {l:4,q:'A car travels 210 km in 2.5 hours. A train covers the same in 1 hour 45 minutes. How much faster is the train in km/h?',a:'36',hint:'Car: 210÷2.5=84 km/h. Train: 210÷1.75=120 km/h. Difference: 120−84=36 km/h.'},
-    {l:4,q:'Class A has 28 students averaging 72. Class B has 22 students averaging 86. What is the combined average? Round to nearest whole number.',a:'78',hint:'Total marks: 28×72+22×86=2016+1892=3908. Students: 50. 3908÷50=78.16≈78.'},
-    {l:4,q:'A recipe for 8 people uses 2/3 cup of sugar. How much for 14 people? Write as a mixed number.',a:'1 1/6',hint:'Per person: (2/3)÷8=1/12. For 14: 14/12=7/6=1 1/6.'},
-    {l:4,q:'A store has 20% off, then an extra 15% off the sale price. What is the total discount percent?',a:'32',hint:'Pay 80% then 85% of that: 0.80×0.85=0.68. So you pay 68%, meaning 32% off total.'},
-    {l:4,q:'Leo earns $18/hr and works 35 hrs/week. He saves 30% of earnings. How many weeks to save $1,890?',a:'10',hint:'Weekly earnings: 18×35=$630. Weekly savings: 30%×$630=$189. Weeks: 1890÷189=10.'},
-    {l:5,q:'A pool 50m × 20m × 2m deep needs filling. Water costs $0.002 per litre. 1 m³ = 1,000 litres. What is the total cost?',a:'4000',hint:'Volume: 50×20×2=2000 m³=2,000,000 L. Cost: 2,000,000×0.002=$4,000.'},
-    {l:5,q:'Ava collects 3/5 of total cans, Ben the rest. Ben collected 80 cans. How many did Ava collect?',a:'120',hint:'Ben has 2/5=80, so total=200. Ava=3/5×200=120.'},
-    {l:5,q:'A sequence: 3, 7, 15, 31, 63... What is the next number?',a:'127',hint:'Each term is double the previous plus 1. 63×2+1=127.'},
-    {l:5,q:'Two cyclists start 120 km apart and ride toward each other. One rides at 18 km/h, the other at 22 km/h. How many hours until they meet?',a:'3',hint:'Combined speed: 18+22=40 km/h. Time: 120÷40=3 hours.'},
+    {l:3,q:'Tank A holds 240L and is 3/4 full. Tank B holds 180L and is 2/3 full. How many more litres are in Tank A?',a:'60',hint:'Tank A: 180L. Tank B: 120L. Difference: 60L.'},
+    {l:3,q:'A shop marks items up 40% then gives a 25% discount. What is the overall percent change?',a:'5',hint:'1.40×0.75=1.05. So 5% more than original.'},
+    {l:4,q:'A car travels 210 km in 2.5 hours. A train covers the same in 1 hour 45 min. How much faster is the train in km/h?',a:'36',hint:'Car: 84 km/h. Train: 120 km/h. Difference: 36 km/h.'},
+    {l:4,q:'Class A has 28 students averaging 72. Class B has 22 students averaging 86. What is the combined average (nearest whole number)?',a:'78',hint:'Total marks: 2016+1892=3908. 3908÷50=78.16≈78.'},
+    {l:4,q:'A recipe for 8 people uses 2/3 cup of sugar. How much for 14 people? Write as a mixed number.',a:'1 1/6',hint:'Per person: 1/12. For 14: 14/12=7/6=1 1/6.'},
+    {l:4,q:'A store has 20% off, then an extra 15% off the sale price. What is the total discount percent?',a:'32',hint:'0.80×0.85=0.68. So 32% off total.'},
+    {l:4,q:'Leo earns $18/hr, works 35 hrs/week, saves 30%. How many weeks to save $1,890?',a:'10',hint:'Weekly savings: 18×35×0.30=$189. 1890÷189=10.'},
+    {l:5,q:'A pool 50m × 20m × 2m deep. Water costs $0.002/litre. 1m³=1000L. What is the total cost?',a:'4000',hint:'2000m³=2,000,000L. 2,000,000×0.002=$4,000.'},
+    {l:5,q:'Ava collects 3/5 of total cans, Ben the rest. Ben collected 80. How many did Ava collect?',a:'120',hint:'Ben=2/5=80, total=200. Ava=3/5×200=120.'},
+    {l:5,q:'A sequence: 3, 7, 15, 31, 63... What is the next number?',a:'127',hint:'Each term: double the previous plus 1. 63×2+1=127.'},
+    {l:5,q:'Two cyclists start 120 km apart, riding toward each other at 18 km/h and 22 km/h. Hours until they meet?',a:'3',hint:'Combined speed: 40 km/h. 120÷40=3 hours.'},
   ],
   geometry:[
-    {l:1,q:'A square has perimeter 52 cm. What is its area in cm²?',a:'169',hint:'Side=52÷4=13 cm. Area=13×13=169 cm².'},
-    {l:1,q:'Two angles of a triangle are 47° and 68°. What is the third angle in degrees?',a:'65',hint:'Angles in a triangle sum to 180°. 180−47−68=65°.'},
-    {l:2,q:'A triangle has base 14 cm and height 9 cm. What is its area in cm²?',a:'63',hint:'Area of triangle = (base × height) ÷ 2 = (14×9)÷2=63 cm².'},
-    {l:2,q:'A rectangle has area 120 cm² and width 8 cm. What is its perimeter in cm?',a:'46',hint:'Length=120÷8=15. Perimeter=2×(15+8)=2×23=46 cm.'},
-    {l:2,q:'An angle is 3 times its complement. What is the size of the angle in degrees?',a:'67.5',hint:'x=3(90−x) → x=270−3x → 4x=270 → x=67.5°.'},
-    {l:2,q:'A room is 6.5 m by 4.8 m. Carpet costs $35 per m². What is the total cost?',a:'1092',hint:'Area=6.5×4.8=31.2 m². Cost=31.2×35=$1,092.'},
-    {l:3,q:'A cube has volume 512 cm³. What is the length of one edge in cm?',a:'8',hint:'Find the cube root of 512. 8×8×8=512.'},
-    {l:3,q:'How many degrees are in the interior angles of a hexagon?',a:'720',hint:'Formula: (n−2)×180. (6−2)×180=4×180=720°.'},
-    {l:3,q:'A cylinder has radius 5 cm and height 10 cm. Estimate its volume using π ≈ 3.14. Round to nearest whole number.',a:'785',hint:'Volume=π×r²×h=3.14×25×10=785 cm³.'},
-    {l:4,q:'A triangle has sides 5 cm, 12 cm, and 13 cm. What is its area in cm²?',a:'30',hint:'Check: 5²+12²=169=13². It\'s a right triangle! Area=(5×12)÷2=30 cm².'},
-    {l:4,q:'An L-shaped room: a 10×6 m rectangle with a 4×3 m piece cut from one corner. What is the floor area in m²?',a:'48',hint:'Full rectangle: 10×6=60 m². Minus cut: 4×3=12 m². 60−12=48 m².'},
-    {l:4,q:'A wheel has diameter 70 cm. Using π ≈ 22/7, how far does it travel in 50 rotations? Answer in cm.',a:'11000',hint:'Circumference=22/7×70=220 cm. 50 rotations: 220×50=11,000 cm.'},
-    {l:4,q:'Two angles of a quadrilateral are 95° each and one is 70°. What is the fourth angle in degrees?',a:'100',hint:'Quadrilateral angles sum to 360°. 360−95−95−70=100°.'},
-    {l:5,q:'A circle is inscribed in a square with side 10 cm. What is the area outside the circle but inside the square? Use π ≈ 3.14.',a:'21.5',hint:'Square area=100. Circle radius=5, area=3.14×25=78.5. Difference=100−78.5=21.5 cm².'},
-    {l:5,q:'A ramp rises 3 m over a horizontal distance of 4 m. How long is the ramp itself in metres?',a:'5',hint:'Pythagorean theorem: 3²+4²=c². 9+16=25. c=√25=5 m.'},
-    {l:5,q:'A trapezoid has parallel sides of 8 cm and 14 cm, and height 6 cm. What is its area in cm²?',a:'66',hint:'Area=(a+b)/2×h=(8+14)/2×6=11×6=66 cm².'},
+    {l:1,q:'A square has perimeter 52 cm. What is its area in cm²?',a:'169',hint:'Side=52÷4=13. Area=13×13=169.'},
+    {l:1,q:'Two angles of a triangle are 47° and 68°. What is the third angle?',a:'65',hint:'Angles sum to 180°. 180−47−68=65°.'},
+    {l:2,q:'A triangle has base 14 cm and height 9 cm. What is its area in cm²?',a:'63',hint:'Area=(14×9)÷2=63 cm².'},
+    {l:2,q:'A rectangle has area 120 cm² and width 8 cm. What is its perimeter in cm?',a:'46',hint:'Length=15. Perimeter=2×(15+8)=46 cm.'},
+    {l:2,q:'An angle is 3 times its complement. What is the angle in degrees?',a:'67.5',hint:'x=3(90−x) → 4x=270 → x=67.5°.'},
+    {l:2,q:'A room is 6.5 m by 4.8 m. Carpet costs $35/m². What is the total cost?',a:'1092',hint:'Area=31.2 m². Cost=31.2×35=$1,092.'},
+    {l:3,q:'A cube has volume 512 cm³. What is the length of one edge in cm?',a:'8',hint:'8×8×8=512.'},
+    {l:3,q:'How many degrees are in the interior angles of a hexagon?',a:'720',hint:'(6−2)×180=4×180=720°.'},
+    {l:3,q:'A cylinder has radius 5 cm and height 10 cm. Estimate volume using π ≈ 3.14.',a:'785',hint:'π×r²×h=3.14×25×10=785 cm³.'},
+    {l:4,q:'A triangle has sides 5 cm, 12 cm, 13 cm. What is its area in cm²?',a:'30',hint:'Right triangle! Area=(5×12)÷2=30 cm².'},
+    {l:4,q:'An L-shaped room: 10×6 m with a 4×3 m corner cut out. What is the floor area in m²?',a:'48',hint:'60−12=48 m².'},
+    {l:4,q:'A wheel has diameter 70 cm. Using π ≈ 22/7, how far in 50 rotations (cm)?',a:'11000',hint:'Circumference=220 cm. 220×50=11,000 cm.'},
+    {l:4,q:'Two angles of a quadrilateral are 95° each, one is 70°. What is the fourth angle?',a:'100',hint:'360−95−95−70=100°.'},
+    {l:5,q:'A circle inscribed in a square with side 10 cm. Area outside circle, inside square? (π≈3.14)',a:'21.5',hint:'100−78.5=21.5 cm².'},
+    {l:5,q:'A ramp rises 3 m over 4 m horizontal. How long is the ramp in metres?',a:'5',hint:'3²+4²=25. √25=5 m.'},
+    {l:5,q:'A trapezoid has parallel sides 8 cm and 14 cm, height 6 cm. Area in cm²?',a:'66',hint:'(8+14)/2×6=11×6=66 cm².'},
   ]
 };
 
