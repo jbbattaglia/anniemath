@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="apple-mobile-web-app-title" content="Math Adventure"/>
+<title>Math Adventure</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --mint:#C8EFE3;--mint-t:#2D7A5F;--mint-b:#A8DFD0;
+  --sky:#C5DFF8;--sky-t:#1A5A8A;--sky-b:#A3CAEF;
+  --peach:#FAD9C8;--peach-t:#8A3D1A;--peach-b:#F0C0A8;
+  --lav:#DDD5F8;--lav-t:#4A3D9A;--lav-b:#C8BCEF;
+  --sun:#FAF0C0;--sun-t:#7A6010;--sun-b:#EFDFAA;
+  --bg:#FFFFFF;--bg2:#F7F7F8;--text:#1A1A1A;--text2:#6B6B6B;--text3:#AAAAAA;
+  --border:#E5E5E5;--border2:#D0D0D0;
+  --radius-xl:20px;--radius-lg:16px;--radius-md:12px;--radius-sm:8px;
+}
+html,body{height:100%;background:var(--bg);color:var(--text);}
+body{font-family:'Nunito',sans-serif;max-width:600px;margin:0 auto;padding:16px 20px 40px;min-height:100%;}
+.screen{display:none;}.screen.active{display:block;}
+.app-header{display:flex;align-items:center;gap:12px;margin-bottom:1.5rem;padding-top:8px;}
+.app-logo{width:44px;height:44px;background:var(--lav);border-radius:var(--radius-lg);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.app-title{font-size:26px;font-weight:800;color:var(--text);letter-spacing:-0.3px;}
+.app-sub{font-size:13px;color:var(--text2);margin-top:1px;}
+.tab-bar{display:flex;gap:6px;margin-bottom:1.5rem;background:var(--bg2);border-radius:var(--radius-lg);padding:4px;}
+.tab-btn{flex:1;padding:10px 12px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;color:var(--text2);background:none;border:none;border-radius:var(--radius-md);cursor:pointer;transition:background .15s,color .15s;-webkit-tap-highlight-color:transparent;}
+.tab-btn.active{background:var(--bg);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.08);border:0.5px solid var(--border);}
+.session-label{font-size:12px;font-weight:800;color:var(--text2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px;}
+.size-row{display:flex;gap:10px;margin-bottom:1.5rem;}
+.size-btn{flex:1;background:var(--bg);border:2px solid var(--border);border-radius:var(--radius-xl);padding:18px 8px;cursor:pointer;text-align:center;transition:border-color .15s,background .15s;-webkit-tap-highlight-color:transparent;user-select:none;}
+.size-btn.selected{border-color:#7F77DD;background:#EEEDFE;}
+.size-btn.selected .size-letter{color:#534AB7;}
+.size-letter{font-size:34px;font-weight:800;color:var(--text);line-height:1;}
+.size-count{font-size:12px;font-weight:700;color:var(--text2);margin-top:5px;}
+.size-desc{font-size:11px;color:var(--text3);margin-top:2px;}
+.go-btn{width:100%;padding:18px;background:var(--lav);border:none;border-radius:var(--radius-xl);font-family:'Nunito',sans-serif;font-size:19px;font-weight:800;color:var(--lav-t);cursor:pointer;transition:background .15s;-webkit-tap-highlight-color:transparent;}
+.go-btn:active{background:var(--lav-b);}
+.skill-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
+.skill-card{border-radius:var(--radius-lg);padding:14px;}
+.skill-icon-wrap{width:36px;height:36px;border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:10px;background:rgba(255,255,255,.55);}
+.skill-name{font-size:13px;font-weight:700;margin-bottom:2px;}
+.skill-lvl{font-size:11px;font-weight:600;opacity:.75;}
+.xp-bar{height:5px;border-radius:3px;margin-top:9px;overflow:hidden;background:rgba(0,0,0,.12);}
+.xp-fill{height:100%;border-radius:3px;transition:width .4s;background:rgba(0,0,0,.28);}
+.badge-row{display:flex;gap:4px;margin-top:9px;font-size:17px;}
+.badge.locked{opacity:.2;filter:grayscale(1);}
+.total-row{display:flex;gap:10px;margin-bottom:1.5rem;flex-wrap:wrap;}
+.total-chip{background:var(--lav);border-radius:var(--radius-lg);padding:10px 18px;font-size:13px;font-weight:700;color:var(--lav-t);}
+.total-chip span{font-size:20px;font-weight:800;display:block;}
+.q-topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.q-counter{font-size:14px;font-weight:700;color:var(--text2);}
+.q-skill-pill{font-size:11px;font-weight:800;padding:5px 13px;border-radius:999px;letter-spacing:.02em;max-width:160px;text-align:center;}
+.streak-pill{font-size:11px;font-weight:800;padding:5px 11px;border-radius:999px;background:var(--sun);color:var(--sun-t);min-width:10px;}
+.streak-pill.hot{background:var(--peach);color:var(--peach-t);}
+.prog-bar{height:8px;border-radius:4px;background:var(--border);margin-bottom:1.25rem;overflow:hidden;}
+.prog-fill{height:100%;border-radius:4px;background:#AFA9EC;transition:width .35s;}
+.score-row{display:flex;gap:10px;margin-bottom:1rem;}
+.score-chip{background:var(--bg2);border-radius:var(--radius-md);padding:7px 14px;font-size:13px;font-weight:700;color:var(--text2);}
+.score-chip b{color:var(--text);font-weight:800;}
+.question-card{background:var(--sky);border-radius:var(--radius-xl);padding:1.5rem;margin-bottom:1.25rem;font-size:18px;font-weight:700;color:var(--sky-t);min-height:100px;display:flex;align-items:center;line-height:1.6;}
+.answer-row{display:flex;gap:10px;margin-bottom:1rem;}
+#answer-input{flex:1;font-family:'Nunito',sans-serif;font-size:20px;font-weight:700;padding:15px 16px;border:2px solid var(--border2);border-radius:var(--radius-xl);background:var(--bg);color:var(--text);outline:none;-webkit-appearance:none;}
+#answer-input:focus{border-color:#AFA9EC;box-shadow:0 0 0 3px #EEEDFE;}
+.check-btn{padding:15px 20px;background:var(--lav);border:none;border-radius:var(--radius-xl);font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;color:var(--lav-t);cursor:pointer;white-space:nowrap;-webkit-tap-highlight-color:transparent;}
+.check-btn:active{background:var(--lav-b);}
+.check-btn:disabled{opacity:.4;}
+.feedback-card{border-radius:var(--radius-xl);padding:1.2rem 1.4rem;margin-bottom:1rem;font-size:15px;line-height:1.65;font-weight:500;display:none;}
+.feedback-card.correct{background:var(--mint);color:var(--mint-t);}
+.feedback-card.wrong{background:var(--peach);color:var(--peach-t);}
+.fb-title{font-size:17px;font-weight:800;margin-bottom:6px;}
+.next-btn{width:100%;padding:15px;background:var(--mint);border:none;border-radius:var(--radius-xl);font-family:'Nunito',sans-serif;font-size:16px;font-weight:800;color:var(--mint-t);cursor:pointer;display:none;-webkit-tap-highlight-color:transparent;}
+.next-btn:active{background:var(--mint-b);}
+.results-hero{text-align:center;padding:2rem 0 1.5rem;}
+.grade-circle{width:96px;height:96px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:44px;font-weight:800;margin:0 auto 14px;}
+.grade-circle.A{background:var(--mint);color:var(--mint-t);}
+.grade-circle.B{background:var(--sky);color:var(--sky-t);}
+.grade-circle.C{background:var(--sun);color:var(--sun-t);}
+.grade-circle.D{background:var(--peach);color:var(--peach-t);}
+.results-msg{font-size:16px;color:var(--text2);font-weight:600;}
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:1.25rem 0;}
+.stat-card{border-radius:var(--radius-lg);padding:1rem;text-align:center;}
+.stat-val{font-size:26px;font-weight:800;}
+.stat-lbl{font-size:11px;font-weight:700;opacity:.7;margin-top:3px;}
+.xp-list{margin:.75rem 0;}
+.xp-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px dashed var(--border);font-size:14px;font-weight:600;}
+.xp-row:last-child{border-bottom:none;}
+.xr-skill{flex:1;color:var(--text);}
+.xr-pts{color:#534AB7;font-weight:800;}
+.xr-none{color:var(--text3);}
+.badge-toast{background:var(--sun);border-radius:var(--radius-lg);padding:11px 15px;font-size:13px;font-weight:700;color:var(--sun-t);margin:6px 0;}
+.action-btn{width:100%;padding:15px;background:var(--lav);border:none;border-radius:var(--radius-xl);font-family:'Nunito',sans-serif;font-size:16px;font-weight:800;color:var(--lav-t);cursor:pointer;margin-top:12px;-webkit-tap-highlight-color:transparent;}
+.action-btn:active{background:var(--lav-b);}
+.section-label{font-size:12px;font-weight:800;color:var(--text2);letter-spacing:.08em;text-transform:uppercase;margin:1.25rem 0 .65rem;}
+</style>
+</head>
+<body>
+
+<!-- HOME -->
+<div id="home-screen" class="screen active">
+  <div class="app-header">
+    <div class="app-logo">⭐</div>
+    <div><div class="app-title">Math Adventure</div><div class="app-sub">Your personal math trainer</div></div>
+  </div>
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('play')">▶ Play</button>
+    <button class="tab-btn" onclick="switchTab('progress')">📊 My Progress</button>
+  </div>
+  <div id="tab-play">
+    <div class="session-label">Choose your session</div>
+    <div class="size-row">
+      <div class="size-btn selected" onclick="selectSize(5,this)"><div class="size-letter">S</div><div class="size-count">5 questions</div><div class="size-desc">Quick warm-up</div></div>
+      <div class="size-btn" onclick="selectSize(10,this)"><div class="size-letter">M</div><div class="size-count">10 questions</div><div class="size-desc">Full practice</div></div>
+      <div class="size-btn" onclick="selectSize(20,this)"><div class="size-letter">L</div><div class="size-count">20 questions</div><div class="size-desc">Deep dive</div></div>
+    </div>
+    <button class="go-btn" onclick="startSession()">Let's go! ✦</button>
+  </div>
+  <div id="tab-progress" style="display:none;">
+    <div class="total-row" id="total-row"></div>
+    <div class="section-label">Skills</div>
+    <div class="skill-grid" id="skill-grid"></div>
+  </div>
+</div>
+
+<!-- QUESTION -->
+<div id="question-screen" class="screen">
+  <div class="q-topbar">
+    <div style="display:flex;gap:6px;align-items:center;">
+      <div class="q-counter">Q<span id="q-num">1</span> of <span id="q-total">5</span></div>
+      <div class="streak-pill" id="streak-pill"></div>
+    </div>
+    <div class="q-skill-pill" id="q-skill-pill">Multiplication</div>
+  </div>
+  <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+  <div class="score-row">
+    <div class="score-chip">Score <b id="live-score">0</b></div>
+    <div class="score-chip">Correct <b id="live-correct">0</b></div>
+  </div>
+  <div class="question-card" id="question-text">Loading your question...</div>
+  <div class="answer-row">
+    <input type="text" id="answer-input" placeholder="Your answer..." autocomplete="off" inputmode="decimal"/>
+    <button class="check-btn" id="submit-btn" onclick="submitAnswer()">Check ✓</button>
+  </div>
+  <div class="feedback-card" id="feedback-card">
+    <div class="fb-title" id="fb-title"></div>
+    <div id="fb-body"></div>
+  </div>
+  <button class="next-btn" id="next-btn" onclick="nextQuestion()">Next question →</button>
+</div>
+
+<!-- RESULTS -->
+<div id="results-screen" class="screen">
+  <div class="results-hero">
+    <div class="grade-circle" id="grade-circle">A</div>
+    <div class="results-msg" id="results-msg"></div>
+  </div>
+  <div class="stat-row">
+    <div class="stat-card" style="background:var(--mint)"><div class="stat-val" style="color:var(--mint-t)" id="res-correct">0</div><div class="stat-lbl" style="color:var(--mint-t)">Correct</div></div>
+    <div class="stat-card" style="background:var(--lav)"><div class="stat-val" style="color:var(--lav-t)" id="res-xp">0</div><div class="stat-lbl" style="color:var(--lav-t)">XP earned</div></div>
+    <div class="stat-card" style="background:var(--sun)"><div class="stat-val" style="color:var(--sun-t)" id="res-streak">0</div><div class="stat-lbl" style="color:var(--sun-t)">Best streak</div></div>
+  </div>
+  <div class="section-label">XP gained this session</div>
+  <div class="xp-list" id="xp-list"></div>
+  <div id="new-badges"></div>
+  <button class="action-btn" onclick="goHome()">Back to home →</button>
+</div>
+
+<script>
+const SKILLS=[
+  {id:'computation',   name:'Computation',             icon:'🧮', bg:'var(--sky)',  tc:'var(--sky-t)',  badges:['🧮','⚡','🏆'],bnames:['Number Cruncher','Lightning Fast','Comp King'],   bat:[50,150,350]},
+  {id:'multiplication',name:'Multiplication & Division',icon:'✖️', bg:'var(--mint)', tc:'var(--mint-t)',badges:['✖️','🎯','🌟'],bnames:['Times Champ','Sharpshooter','Star Multiplier'],  bat:[50,150,350]},
+  {id:'fractions',     name:'Fractions & Decimals',    icon:'🍕', bg:'var(--peach)',tc:'var(--peach-t)',badges:['🍕','🔢','💎'],bnames:['Fraction Finder','Decimal Wizard','Diamond Cutter'],bat:[50,150,350]},
+  {id:'wordproblems',  name:'Word Problems',            icon:'📖', bg:'var(--lav)',  tc:'var(--lav-t)',  badges:['📖','🧠','🦉'],bnames:['Story Solver','Brain Power','Wise Owl'],        bat:[50,150,350]},
+  {id:'geometry',      name:'Geometry & Measurement',  icon:'📐', bg:'var(--sun)',  tc:'var(--sun-t)',  badges:['📐','🔷','🏛️'],bnames:['Shape Spotter','Geo Pro','Architect'],           bat:[50,150,350]}
+];
+
+const QB={
+  computation:[
+    {l:1,q:'What is 378 + 245?',a:'623',hint:'Add ones: 8+5=13, carry 1. Tens: 7+4+1=12, carry 1. Hundreds: 3+2+1=6.'},
+    {l:1,q:'What is 503 − 167?',a:'336',hint:'Borrow from hundreds: 503 → 4 hundreds, 9 tens, 13 ones. Now subtract carefully.'},
+    {l:1,q:'What is 9 × 8 + 7 × 6?',a:'114',hint:'Multiply first (order of operations): 9×8=72 and 7×6=42. Then add.'},
+    {l:1,q:'What is 6 × 7 − 4 × 5?',a:'22',hint:'Multiply first: 6×7=42, 4×5=20. Then subtract.'},
+    {l:2,q:'What is (15 + 9) × 7 − 30?',a:'138',hint:'Brackets first: 15+9=24. Then 24×7=168. Then 168−30.'},
+    {l:2,q:'What is 48 × 25?',a:'1200',hint:'48×25 = 48×100÷4 = 4800÷4 = 1200.'},
+    {l:2,q:'What is 1,008 − 349?',a:'659',hint:'Count up: 349→350 (+1), →400 (+50), →1000 (+600), →1008 (+8). Total=659.'},
+    {l:2,q:'What is 12 × 12 − 5 × 5?',a:'119',hint:'12×12=144, 5×5=25. Then 144−25=119.'},
+    {l:2,q:'What is 3 × (14 + 8) − 4 × 9?',a:'30',hint:'Bracket: 14+8=22. Then 3×22=66. Then 4×9=36. Then 66−36.'},
+    {l:3,q:'What is 125 × 8?',a:'1000',hint:'125×8 = 125×4×2 = 500×2 = 1000.'},
+    {l:3,q:'What is 2,400 ÷ 16?',a:'150',hint:'2400÷16 = 1200÷8 = 600÷4 = 150. Keep halving both.'},
+    {l:3,q:'What is 99 × 13?',a:'1287',hint:'99×13 = 100×13 − 13 = 1300−13 = 1287.'},
+    {l:3,q:'What is 17 × 18?',a:'306',hint:'17×18 = 17×20 − 17×2 = 340−34 = 306.'},
+    {l:4,q:'What is (100 − 36) ÷ 8 + 7 × 4?',a:'36',hint:'64÷8=8 and 7×4=28. Then 8+28=36.'},
+    {l:4,q:'What is 999 + 998 + 997?',a:'2994',hint:'Think: 3×1000=3000, then subtract 1+2+3=6. So 3000−6=2994.'},
+    {l:4,q:'What is 36 × 25 + 64 × 25?',a:'2500',hint:'Factor out 25: (36+64)×25 = 100×25 = 2500.'},
+    {l:4,q:'What is 15² − 10²?',a:'125',hint:'15²=225, 10²=100. 225−100=125.'},
+    {l:5,q:'What is 1,234 × 9?',a:'11106',hint:'1234×9 = 1234×10 − 1234 = 12340−1234 = 11106.'},
+    {l:5,q:'If 3x = 72, what is x?',a:'24',hint:'Divide both sides by 3: x = 72÷3 = 24.'},
+    {l:5,q:'What is 2³ × 5²?',a:'200',hint:'2³=8, 5²=25. Then 8×25=200.'},
+    {l:5,q:'What is 4,500 ÷ 36?',a:'125',hint:'Divide both by 4: 1125÷9=125.'},
+  ],
+  multiplication:[
+    {l:1,q:'What is 23 × 14?',a:'322',hint:'23×14 = 23×10 + 23×4 = 230+92 = 322.'},
+    {l:1,q:'What is 252 ÷ 12?',a:'21',hint:'12×20=240, 252−240=12, 12÷12=1. So 20+1=21.'},
+    {l:1,q:'What is 36 × 15?',a:'540',hint:'36×15 = 36×10 + 36×5 = 360+180 = 540.'},
+    {l:2,q:'What is 48 × 35?',a:'1680',hint:'48×35 = 48×30 + 48×5 = 1440+240 = 1680.'},
+    {l:2,q:'What is 432 ÷ 16?',a:'27',hint:'16×25=400. 432−400=32. 32÷16=2. So 25+2=27.'},
+    {l:2,q:'What is 75 × 16?',a:'1200',hint:'75×16 = 75×4×4 = 300×4 = 1200.'},
+    {l:2,q:'What is 784 ÷ 28?',a:'28',hint:'28×28=784. 28×20=560, 28×8=224, 560+224=784.'},
+    {l:3,q:'What is 124 × 25?',a:'3100',hint:'124×25 = 124×100÷4 = 12400÷4 = 3100.'},
+    {l:3,q:'What is 67 × 99?',a:'6633',hint:'67×99 = 67×100 − 67 = 6700−67 = 6633.'},
+    {l:3,q:'What is 2,016 ÷ 48?',a:'42',hint:'48×40=1920, 2016−1920=96, 96÷48=2. So 40+2=42.'},
+    {l:4,q:'What is 225 × 16?',a:'3600',hint:'225×16 = 225×4×4 = 900×4 = 3600.'},
+    {l:4,q:'What is 138 × 35?',a:'4830',hint:'138×35 = 138×30 + 138×5 = 4140+690 = 4830.'},
+    {l:4,q:'What is 3,375 ÷ 75?',a:'45',hint:'75×40=3000, 3375−3000=375, 375÷75=5. So 40+5=45.'},
+    {l:5,q:'What is 8,640 ÷ 96?',a:'90',hint:'Simplify by dividing both by 4: 2160÷24. Divide by 4 again: 540÷6=90.'},
+    {l:5,q:'A number times 36 equals 5,400. What is the number?',a:'150',hint:'5400÷36: 5400÷6=900, 900÷6=150.'},
+  ],
+  fractions:[
+    {l:1,q:'What is 2/3 + 1/4? Write as a fraction.',a:'11/12',hint:'Common denominator is 12. 2/3=8/12, 1/4=3/12. Add tops: 8+3=11.'},
+    {l:1,q:'What is 3/4 − 1/3? Write as a fraction.',a:'5/12',hint:'Common denom 12: 3/4=9/12, 1/3=4/12. Subtract: 9−4=5.'},
+    {l:1,q:'What is 2/3 × 3/8? Simplify fully.',a:'1/4',hint:'Multiply: 2×3=6, 3×8=24. So 6/24. Divide both by 6: 1/4.'},
+    {l:2,q:'What is 5/6 ÷ 5/3? Simplify fully.',a:'1/2',hint:'Flip and multiply: 5/6 × 3/5 = 15/30 = 1/2.'},
+    {l:2,q:'What is 2 3/4 + 1 5/6? Write as a mixed number.',a:'4 7/12',hint:'Whole numbers: 2+1=3. Fractions with denom 12: 9/12+10/12=19/12=1 7/12. Total: 4 7/12.'},
+    {l:2,q:'What is 3 1/2 − 1 3/4? Write as a mixed number.',a:'1 3/4',hint:'Convert: 3 2/4 − 1 3/4. Borrow: 2 6/4 − 1 3/4 = 1 3/4.'},
+    {l:2,q:'What is 0.125 as a fraction? Simplify fully.',a:'1/8',hint:'0.125 = 125/1000. Divide by 125: 1/8.'},
+    {l:2,q:'What is 3/8 as a decimal?',a:'0.375',hint:'3÷8: 8 into 30 = 3 remainder 6. 8 into 60 = 7 remainder 4. 8 into 40 = 5. So 0.375.'},
+    {l:3,q:'What is 4/5 × 2 1/2? Simplify.',a:'2',hint:'Convert 2 1/2 to 5/2. Then 4/5 × 5/2 = 20/10 = 2.'},
+    {l:3,q:'Which is larger: 7/12 or 5/9?',a:'7/12',hint:'Common denom 36: 7/12=21/36, 5/9=20/36. 21>20, so 7/12 is larger.'},
+    {l:3,q:'What is 1 2/3 × 2 2/5? Write as a whole number.',a:'4',hint:'Convert: 5/3 × 12/5 = 60/15 = 4.'},
+    {l:3,q:'What is 2 3/4 × 1 1/3? Write as a mixed number.',a:'3 2/3',hint:'Convert: 11/4 × 4/3 = 44/12 = 11/3 = 3 2/3.'},
+    {l:4,q:'What is 5 ÷ 2/3? Write as a mixed number.',a:'7 1/2',hint:'5 ÷ 2/3 = 5 × 3/2 = 15/2 = 7 1/2.'},
+    {l:4,q:'What percentage is 3/8?',a:'37.5',hint:'3÷8=0.375. Multiply by 100: 37.5%.'},
+    {l:5,q:'A jar is 3/5 full. You add 1/4 more. What fraction is now filled?',a:'17/20',hint:'Common denom 20: 12/20 + 5/20 = 17/20.'},
+    {l:5,q:'What is 2 5/6 ÷ 1 1/4? Write as a mixed number.',a:'2 4/15',hint:'17/6 ÷ 5/4 = 17/6 × 4/5 = 68/30 = 34/15 = 2 4/15.'},
+    {l:5,q:'If 2/3 of a number is 48, what is 3/4 of that same number?',a:'54',hint:'Whole number: 48÷(2/3)=48×3/2=72. Then 3/4 of 72=54.'},
+  ],
+  wordproblems:[
+    {l:1,q:'A school orders 24 boxes of pencils with 36 pencils each. They use 415 pencils. How many are left?',a:'449',hint:'Total: 24×36=864. Then 864−415=449.'},
+    {l:1,q:'Mia saves $12.50 per week. After 8 weeks she spends $47.50. How much does she have left?',a:'52.50',hint:'Total saved: 12.50×8=$100. Then $100−$47.50=$52.50.'},
+    {l:2,q:'A train travels at 75 mph. How far does it travel in 2 hours and 40 minutes?',a:'200',hint:'2h 40min = 8/3 hours. 75 × 8/3 = 600÷3 = 200 miles.'},
+    {l:2,q:'Three friends share a prize equally. One gives half her share to her sister who gets $45. What was the total prize?',a:'270',hint:'Half a share=$45, so one share=$90. Total=3×$90=$270.'},
+    {l:2,q:'Apples cost $1.35 each or 6 for $7.20. How much do you save per apple buying in bulk?',a:'0.15',hint:'Bulk price: $7.20÷6=$1.20. Saving: $1.35−$1.20=$0.15.'},
+    {l:2,q:'A pool holds 15,000 litres. A pump fills it at 250 litres per minute. How many hours to fill it?',a:'1',hint:'15000÷250=60 minutes = 1 hour.'},
+    {l:2,q:'A farmer plants 3/4 of a field with corn and 1/6 with wheat. What fraction is unplanted?',a:'1/12',hint:'Planted: 3/4+1/6. Common denom 12: 9/12+2/12=11/12. Unplanted: 1−11/12=1/12.'},
+    {l:3,q:'A rectangle has perimeter 54 cm. Its length is twice its width. What is its area in cm²?',a:'162',hint:'Let width=w, length=2w. Perimeter: 2(w+2w)=6w=54, so w=9. Area=9×18=162.'},
+    {l:3,q:'A taxi charges $2.50 base fare plus $0.75 per quarter mile. What is the fare for a 4-mile trip?',a:'14.50',hint:'4 miles=16 quarter-miles. 16×$0.75=$12. Total: $2.50+$12=$14.50.'},
+    {l:3,q:'Tank A holds 240L and is 3/4 full. Tank B holds 180L and is 2/3 full. How many more litres are in Tank A?',a:'60',hint:'Tank A: 3/4×240=180L. Tank B: 2/3×180=120L. Difference: 180−120=60L.'},
+    {l:3,q:'A shop marks up items by 40% then gives a 25% discount. What is the overall percent change from the original price?',a:'5',hint:'After markup: ×1.40. After discount: ×0.75. Combined: 1.40×0.75=1.05. So 5% more than original.'},
+    {l:4,q:'A car travels 210 km in 2.5 hours. A train covers the same in 1 hour 45 minutes. How much faster is the train in km/h?',a:'36',hint:'Car: 210÷2.5=84 km/h. Train: 210÷1.75=120 km/h. Difference: 120−84=36 km/h.'},
+    {l:4,q:'Class A has 28 students averaging 72. Class B has 22 students averaging 86. What is the combined average? Round to nearest whole number.',a:'78',hint:'Total marks: 28×72+22×86=2016+1892=3908. Students: 50. 3908÷50=78.16≈78.'},
+    {l:4,q:'A recipe for 8 people uses 2/3 cup of sugar. How much for 14 people? Write as a mixed number.',a:'1 1/6',hint:'Per person: (2/3)÷8=1/12. For 14: 14/12=7/6=1 1/6.'},
+    {l:4,q:'A store has 20% off, then an extra 15% off the sale price. What is the total discount percent?',a:'32',hint:'Pay 80% then 85% of that: 0.80×0.85=0.68. So you pay 68%, meaning 32% off total.'},
+    {l:4,q:'Leo earns $18/hr and works 35 hrs/week. He saves 30% of earnings. How many weeks to save $1,890?',a:'10',hint:'Weekly earnings: 18×35=$630. Weekly savings: 30%×$630=$189. Weeks: 1890÷189=10.'},
+    {l:5,q:'A pool 50m × 20m × 2m deep needs filling. Water costs $0.002 per litre. 1 m³ = 1,000 litres. What is the total cost?',a:'4000',hint:'Volume: 50×20×2=2000 m³=2,000,000 L. Cost: 2,000,000×0.002=$4,000.'},
+    {l:5,q:'Ava collects 3/5 of total cans, Ben the rest. Ben collected 80 cans. How many did Ava collect?',a:'120',hint:'Ben has 2/5=80, so total=200. Ava=3/5×200=120.'},
+    {l:5,q:'A sequence: 3, 7, 15, 31, 63... What is the next number?',a:'127',hint:'Each term is double the previous plus 1. 63×2+1=127.'},
+    {l:5,q:'Two cyclists start 120 km apart and ride toward each other. One rides at 18 km/h, the other at 22 km/h. How many hours until they meet?',a:'3',hint:'Combined speed: 18+22=40 km/h. Time: 120÷40=3 hours.'},
+  ],
+  geometry:[
+    {l:1,q:'A square has perimeter 52 cm. What is its area in cm²?',a:'169',hint:'Side=52÷4=13 cm. Area=13×13=169 cm².'},
+    {l:1,q:'Two angles of a triangle are 47° and 68°. What is the third angle in degrees?',a:'65',hint:'Angles in a triangle sum to 180°. 180−47−68=65°.'},
+    {l:2,q:'A triangle has base 14 cm and height 9 cm. What is its area in cm²?',a:'63',hint:'Area of triangle = (base × height) ÷ 2 = (14×9)÷2=63 cm².'},
+    {l:2,q:'A rectangle has area 120 cm² and width 8 cm. What is its perimeter in cm?',a:'46',hint:'Length=120÷8=15. Perimeter=2×(15+8)=2×23=46 cm.'},
+    {l:2,q:'An angle is 3 times its complement. What is the size of the angle in degrees?',a:'67.5',hint:'x=3(90−x) → x=270−3x → 4x=270 → x=67.5°.'},
+    {l:2,q:'A room is 6.5 m by 4.8 m. Carpet costs $35 per m². What is the total cost?',a:'1092',hint:'Area=6.5×4.8=31.2 m². Cost=31.2×35=$1,092.'},
+    {l:3,q:'A cube has volume 512 cm³. What is the length of one edge in cm?',a:'8',hint:'Find the cube root of 512. 8×8×8=512.'},
+    {l:3,q:'How many degrees are in the interior angles of a hexagon?',a:'720',hint:'Formula: (n−2)×180. (6−2)×180=4×180=720°.'},
+    {l:3,q:'A cylinder has radius 5 cm and height 10 cm. Estimate its volume using π ≈ 3.14. Round to nearest whole number.',a:'785',hint:'Volume=π×r²×h=3.14×25×10=785 cm³.'},
+    {l:4,q:'A triangle has sides 5 cm, 12 cm, and 13 cm. What is its area in cm²?',a:'30',hint:'Check: 5²+12²=169=13². It\'s a right triangle! Area=(5×12)÷2=30 cm².'},
+    {l:4,q:'An L-shaped room: a 10×6 m rectangle with a 4×3 m piece cut from one corner. What is the floor area in m²?',a:'48',hint:'Full rectangle: 10×6=60 m². Minus cut: 4×3=12 m². 60−12=48 m².'},
+    {l:4,q:'A wheel has diameter 70 cm. Using π ≈ 22/7, how far does it travel in 50 rotations? Answer in cm.',a:'11000',hint:'Circumference=22/7×70=220 cm. 50 rotations: 220×50=11,000 cm.'},
+    {l:4,q:'Two angles of a quadrilateral are 95° each and one is 70°. What is the fourth angle in degrees?',a:'100',hint:'Quadrilateral angles sum to 360°. 360−95−95−70=100°.'},
+    {l:5,q:'A circle is inscribed in a square with side 10 cm. What is the area outside the circle but inside the square? Use π ≈ 3.14.',a:'21.5',hint:'Square area=100. Circle radius=5, area=3.14×25=78.5. Difference=100−78.5=21.5 cm².'},
+    {l:5,q:'A ramp rises 3 m over a horizontal distance of 4 m. How long is the ramp itself in metres?',a:'5',hint:'Pythagorean theorem: 3²+4²=c². 9+16=25. c=√25=5 m.'},
+    {l:5,q:'A trapezoid has parallel sides of 8 cm and 14 cm, and height 6 cm. What is its area in cm²?',a:'66',hint:'Area=(a+b)/2×h=(8+14)/2×6=11×6=66 cm².'},
+  ]
+};
+
+let state={xp:{},sessions:0};
+try{const s=localStorage.getItem('mathAdv_v1');if(s)state=JSON.parse(s);}catch(e){}
+SKILLS.forEach(s=>{if(!state.xp[s.id])state.xp[s.id]=0;});
+function save(){try{localStorage.setItem('mathAdv_v1',JSON.stringify(state));}catch(e){}}
+
+function getLevel(xp){
+  if(xp<50)return{level:1,label:'Beginner',next:50};
+  if(xp<150)return{level:2,label:'Apprentice',next:150};
+  if(xp<350)return{level:3,label:'Advanced',next:350};
+  if(xp<700)return{level:4,label:'Expert',next:700};
+  return{level:5,label:'Master',next:999};
+}
+
+function switchTab(t){
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',(i===0&&t==='play')||(i===1&&t==='progress')));
+  document.getElementById('tab-play').style.display=t==='play'?'block':'none';
+  document.getElementById('tab-progress').style.display=t==='progress'?'block':'none';
+  if(t==='progress')renderProgress();
+}
+
+function renderProgress(){
+  const tot=SKILLS.reduce((a,s)=>a+(state.xp[s.id]||0),0);
+  document.getElementById('total-row').innerHTML=`<div class="total-chip"><span>${tot}</span>Total XP</div><div class="total-chip"><span>${state.sessions||0}</span>Sessions</div>`;
+  const g=document.getElementById('skill-grid');g.innerHTML='';
+  SKILLS.forEach(sk=>{
+    const xp=state.xp[sk.id]||0,lv=getLevel(xp),pct=Math.min(100,Math.round((xp/lv.next)*100));
+    const bdg=sk.badges.map((b,i)=>`<span class="badge${xp>=sk.bat[i]?'':' locked'}" title="${sk.bnames[i]}">${b}</span>`).join('');
+    const c=document.createElement('div');c.className='skill-card';c.style.background=sk.bg;
+    c.innerHTML=`<div class="skill-icon-wrap">${sk.icon}</div><div class="skill-name" style="color:${sk.tc}">${sk.name}</div><div class="skill-lvl" style="color:${sk.tc}">Lv ${lv.level} · ${lv.label} · ${xp} XP</div><div class="xp-bar"><div class="xp-fill" style="width:${pct}%"></div></div><div class="badge-row">${bdg}</div>`;
+    g.appendChild(c);
+  });
+}
+
+let selectedSize=5;
+function selectSize(n,el){selectedSize=n;document.querySelectorAll('.size-btn').forEach(b=>b.classList.remove('selected'));el.classList.add('selected');}
+
+let session={};
+function startSession(){
+  state.sessions=(state.sessions||0)+1;save();
+  session={total:selectedSize,current:0,correct:0,score:0,streak:0,bestStreak:0,xpGained:{},newBadges:[],usedQs:{}};
+  SKILLS.forEach(s=>{session.xpGained[s.id]=0;session.usedQs[s.id]=[];});
+  showScreen('question-screen');loadQ();
+}
+
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+
+let curQ=null,answered=false;
+
+function pickQ(skillId){
+  const xp=state.xp[skillId]||0,lv=getLevel(xp);
+  const acc=session.correct/Math.max(1,session.current);
+  const target=Math.min(5,lv.level+(acc>0.85?1:0));
+  const pool=QB[skillId],used=session.usedQs[skillId];
+  let cands=pool.filter(q=>q.l<=target&&!used.includes(q.q));
+  if(!cands.length)cands=pool.filter(q=>!used.includes(q.q));
+  if(!cands.length)cands=[...pool];
+  const pref=cands.filter(q=>q.l===target||q.l===target-1);
+  const from=pref.length?pref:cands;
+  const chosen=from[Math.floor(Math.random()*from.length)];
+  session.usedQs[skillId].push(chosen.q);
+  return chosen;
+}
+
+function loadQ(){
+  answered=false;
+  const ai=document.getElementById('answer-input');
+  ai.value='';ai.disabled=false;
+  document.getElementById('submit-btn').disabled=false;
+  document.getElementById('feedback-card').style.display='none';
+  document.getElementById('next-btn').style.display='none';
+  document.getElementById('q-num').textContent=session.current+1;
+  document.getElementById('q-total').textContent=session.total;
+  document.getElementById('prog-fill').style.width=Math.round((session.current/session.total)*100)+'%';
+  document.getElementById('live-score').textContent=session.score;
+  document.getElementById('live-correct').textContent=session.correct;
+  const sp=document.getElementById('streak-pill');
+  if(session.streak>=3){sp.textContent='🔥 '+session.streak+'!';sp.className='streak-pill hot';}
+  else if(session.streak>0){sp.textContent='✦ '+session.streak;sp.className='streak-pill';}
+  else{sp.textContent='';sp.className='streak-pill';}
+  const weakest=SKILLS.slice().sort((a,b)=>(state.xp[a.id]||0)-(state.xp[b.id]||0))[0].id;
+  const focusId=(session.current%4===3)?weakest:SKILLS[Math.floor(Math.random()*SKILLS.length)].id;
+  const sk=SKILLS.find(s=>s.id===focusId);
+  const pill=document.getElementById('q-skill-pill');
+  pill.textContent=sk.name;pill.style.background=sk.bg;pill.style.color=sk.tc;
+  const q=pickQ(focusId);
+  curQ={...q,skillId:focusId,skill:sk};
+  document.getElementById('question-text').textContent=curQ.q;
+  ai.focus();
+}
+
+function norm(v){return v.toString().trim().toLowerCase().replace(/\s+/g,'').replace(/,/g,'').replace(/\$/g,'').replace(/cm²|m²|°|cm|km|m/g,'');}
+
+function submitAnswer(){
+  if(answered||!curQ)return;
+  const ua=document.getElementById('answer-input').value.trim();
+  if(!ua)return;
+  answered=true;
+  document.getElementById('answer-input').disabled=true;
+  document.getElementById('submit-btn').disabled=true;
+  const ok=norm(ua)===norm(curQ.a);
+  const fc=document.getElementById('feedback-card');
+  fc.style.display='block';fc.className='feedback-card '+(ok?'correct':'wrong');
+  const okT=['🌟 Nailed it!','✓ Correct!','🎉 Yes!','✓ Brilliant!','🌟 Spot on!'];
+  const wrongT=['✗ Not quite — here\'s the key:','✗ Good try! Here\'s the trick:','✗ Almost! Think about it this way:','✗ Nice effort! Here\'s a tip:'];
+  if(ok){
+    document.getElementById('fb-title').textContent=session.streak>=2?'🔥 Streak! '+okT[Math.floor(Math.random()*okT.length)]:okT[Math.floor(Math.random()*okT.length)];
+    document.getElementById('fb-body').textContent='The answer is '+curQ.a+'. Excellent reasoning!';
+    session.correct++;session.streak++;
+    session.bestStreak=Math.max(session.bestStreak,session.streak);
+    const xpE=10+Math.min(10,Math.floor(session.streak/3)*2);
+    session.score+=xpE;session.xpGained[curQ.skillId]=(session.xpGained[curQ.skillId]||0)+xpE;
+    document.getElementById('live-score').textContent=session.score;
+    document.getElementById('live-correct').textContent=session.correct;
+    const oldXp=state.xp[curQ.skillId],newXp=oldXp+xpE;
+    curQ.skill.bat.forEach((t,i)=>{if(oldXp<t&&newXp>=t)session.newBadges.push({badge:curQ.skill.badges[i],name:curQ.skill.bnames[i],skillName:curQ.skill.name});});
+    state.xp[curQ.skillId]=newXp;save();
+  }else{
+    document.getElementById('fb-title').textContent=wrongT[Math.floor(Math.random()*wrongT.length)];
+    document.getElementById('fb-body').textContent=curQ.hint+' Answer: '+curQ.a+'.';
+    session.streak=0;
+  }
+  document.getElementById('next-btn').style.display='block';
+}
+
+function nextQuestion(){session.current++;if(session.current>=session.total)showResults();else loadQ();}
+
+function showResults(){
+  showScreen('results-screen');
+  const pct=session.correct/session.total;
+  const grade=pct>=0.9?'A':pct>=0.75?'B':pct>=0.6?'C':'D';
+  const msgs={A:'🌟 Absolutely crushed it!',B:'👍 Great work — real progress!',C:'Keep going — you\'re building strength!',D:'Nice effort — the hard ones teach the most!'};
+  const gc=document.getElementById('grade-circle');gc.textContent=grade;gc.className='grade-circle '+grade;
+  document.getElementById('results-msg').textContent=msgs[grade];
+  document.getElementById('res-correct').textContent=session.correct+'/'+session.total;
+  document.getElementById('res-xp').textContent='+'+session.score;
+  document.getElementById('res-streak').textContent=session.bestStreak;
+  const xl=document.getElementById('xp-list');xl.innerHTML='';
+  SKILLS.forEach(sk=>{
+    const g=session.xpGained[sk.id]||0;
+    const row=document.createElement('div');row.className='xp-row';
+    row.innerHTML=`<div class="xr-skill">${sk.name}</div>${g>0?`<div class="xr-pts">+${g} XP · Total: ${state.xp[sk.id]}</div>`:'<div class="xr-none">—</div>'}`;
+    xl.appendChild(row);
+  });
+  const nb=document.getElementById('new-badges');nb.innerHTML='';
+  session.newBadges.forEach(b=>{const t=document.createElement('div');t.className='badge-toast';t.innerHTML=`${b.badge} New badge: <b>${b.name}</b> (${b.skillName})`;nb.appendChild(t);});
+}
+
+function goHome(){showScreen('home-screen');switchTab('play');}
+
+document.getElementById('answer-input').addEventListener('keydown',e=>{
+  if(e.key==='Enter'){if(!answered)submitAnswer();else if(document.getElementById('next-btn').style.display!=='none')nextQuestion();}
+});
+</script>
+</body>
+</html>
